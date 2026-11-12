@@ -3,7 +3,13 @@
 
   const cfg = window.PLAYGROUND_CONFIG || {};
   const samples = window.PLAYGROUND_SAMPLES || {};
-  const sampleName = new URLSearchParams(location.search).get("sample");
+  const params = new URLSearchParams(location.search);
+  const sampleName = params.get("sample");
+  // Device check link: ?key=<customer's SDK key> runs the check under that
+  // account, so results land in the customer's own dashboard.
+  const linkKey = /^sk_[0-9a-f]{40}$/.test(params.get("key") || "") ? params.get("key") : null;
+  const sdkKey = linkKey || cfg.sdkKey;
+  const flow = linkKey ? "device_check" : "playground";
   const HISTORY_KEY = "dv_playground_checks";
   const KEY_PLACEHOLDER = "YOUR_SDK_KEY";
   const $ = (id) => document.getElementById(id);
@@ -89,7 +95,7 @@
   void check();
 
   function loadSdk() {
-    if (!cfg.sdkKey || cfg.sdkKey === KEY_PLACEHOLDER) {
+    if (!sdkKey || sdkKey === KEY_PLACEHOLDER) {
       return Promise.reject(new PlaygroundError("no-key"));
     }
     return new Promise((resolve, reject) => {
@@ -99,7 +105,7 @@
       s.onload = () => {
         if (!window.DeepvueImprint) return reject(new PlaygroundError("blocked"));
         // Manual mode: nothing on page load, one collect per check.
-        window.DeepvueImprint.config({ apiKey: cfg.sdkKey, autoCollectOnLoad: false });
+        window.DeepvueImprint.config({ apiKey: sdkKey, autoCollectOnLoad: false });
         resolve(window.DeepvueImprint);
       };
       s.onerror = () => reject(new PlaygroundError("blocked"));
@@ -118,7 +124,7 @@
         res = JSON.parse(JSON.stringify(res));
       } else {
         const sdk = await sdkReady;
-        res = await sdk.collect({ tag: { flow: "playground" } });
+        res = await sdk.collect({ tag: { flow } });
       }
       $("raw").textContent = JSON.stringify(res, null, 2);
       if (!res || res._error || !res.risk) {
@@ -291,7 +297,7 @@
       card.hidden = true;
       return;
     }
-    const url = location.origin + location.pathname;
+    const url = location.origin + location.pathname + (linkKey ? `?key=${linkKey}` : "");
     const qr = window.qrcode(0, "M");
     qr.addData(url);
     qr.make();

@@ -35,6 +35,10 @@ Everything lives in `config.js`:
 Use a Deepvue-owned account made for the playground, not a customer's, so these sessions stay out
 of customers' Risk Monitoring. Each check is tagged `flow: playground`.
 
+**Device check links.** `?key=<SDK key>` runs the check under that key instead, tagged
+`flow: device_check`, so a customer can send the link to testers and see the results in their own
+dashboard without writing code. The QR code then carries the key too.
+
 ## Costs and limits
 
 - **Every check is one collect**, billed like any other collect on the account whose key is in
@@ -47,7 +51,15 @@ of customers' Risk Monitoring. Each check is tagged `flow: playground`.
 
 ## Deploy
 
-Host the folder on any static HTTPS host, for example S3 behind CloudFront.
+Host the folder on any static HTTPS host. For AWS, [`infra/playground-hosting.yaml`](../infra/playground-hosting.yaml)
+creates a private S3 bucket served only through CloudFront (origin access control). Then, with
+your SDK key in `config.js`:
+
+```bash
+aws s3 sync playground/ s3://<bucket>/ --exclude README.md --cache-control "public, max-age=300" --delete
+aws cloudfront create-invalidation --distribution-id <distribution id> --paths "/*"
+```
+
 The page loads from outside the folder:
 
 - the SDK from the Deepvue CDN (`sdkUrl`), which calls `https://sidc.deepvue.ai`;
