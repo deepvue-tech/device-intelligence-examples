@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referral cashback abuse demo | Deepvue</title>
+  <meta name="description" content="A fake wallet sign-up with referral cashback that pays once per device, however many mobile numbers one person brings.">
+  <link rel="icon" href="deepvue-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home"><img src="deepvue-logo.png" alt="Deepvue" width="129" height="26"></a>
+      <span class="topbar-tag">Use-case demos</span>
+      <nav class="topbar-nav">
+        <a class="link" href="/">All demos</a>
+        <a class="btn btn-primary btn-sm" href="https://dashboard.deepvue.ai/sign-up">Get an SDK key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Stop referral and cashback farming</h1>
+      <p class="lede">
+        One person, one phone, twenty accounts. Each new account needs a fresh mobile number, which is
+        cheap. It doesn't need a new device, so pay the cashback once per device.
+      </p>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="layout">
+      <div class="col-main">
+        <section class="card">
+          <div class="app-head">
+            <span class="app-logo" aria-hidden="true">DP</span>
+            <div>
+              <h2>Demo Pay</h2>
+              <p class="muted small">Open a wallet, get ₹100 cashback with a friend's code</p>
+            </div>
+            <span class="app-tag">Fake app</span>
+          </div>
+
+          <form id="form" class="form" novalidate>
+            <label class="field">
+              <span>Mobile number</span>
+              <span class="input-row">
+                <input name="mobile" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" required>
+                <button id="new-number" class="btn btn-ghost btn-sm" type="button">New number</button>
+              </span>
+              <small>A random sample number. No SMS is sent.</small>
+            </label>
+            <label class="field">
+              <span>Referral code</span>
+              <input name="code" type="text" value="ASHA100" pattern="[A-Za-z0-9]{4,16}" maxlength="16" required autocapitalize="characters">
+            </label>
+            <div class="form-actions full">
+              <button class="btn btn-primary" type="submit">Create account</button>
+            </div>
+          </form>
+        </section>
+
+        <div id="shared"></div>
+      </div>
+
+      <aside class="col-side">
+        <section class="card">
+          <div class="card-head"><h2>Try to fool it</h2></div>
+          <ol class="tries">
+            <li><strong>Create an account.</strong> The cashback is credited.</li>
+            <li><strong>Press New number</strong> and create another, as someone with a drawer of SIM cards would.</li>
+            <li><strong>Open this page in a private window</strong>, or clear this site's data, and sign up again. Same device, no cashback.</li>
+            <li><strong>Turn on a VPN</strong> on a fresh device: the cashback waits for a review.</li>
+          </ol>
+          <p class="side-note">Press <em>Forget this device</em> to start over.</p>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Not a hard block</h2></div>
+          <p class="muted">
+            Families share a phone, so the second account still opens. Only the reward is held back, which
+            removes the reason to farm.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>The SDK collects device and browser metadata, never names, phone numbers or emails. The demo server keeps each device's history in memory for 24 hours, with mobile numbers masked.</p>
+      <p>© Deepvue. Source: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/use-cases">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+
+  <script src="mock.js"></script>
+  <script src="demo.js"></script>
+  <script>
+    const form = document.getElementById("form");
+    const newNumber = () => (form.mobile.value = "9" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0"));
+    document.getElementById("new-number").addEventListener("click", newNumber);
+    newNumber();
+
+    Demo.init({
+      demo: "referral",
+      flow: "signup",
+      form,
+      actionLabel: "Create account",
+      linkedIdName: "signupId",
+      linkedId: () => Demo.ref("SU"),
+      input: (f) => ({ mobile: f.mobile.value, code: f.code.value }),
+    });
+  </script>
+</body>
+</html>

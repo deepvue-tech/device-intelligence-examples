@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud use-case demos | Deepvue</title>
+  <meta name="description" content="Runnable fraud demos for lenders and fintechs: edited loan applications, referral cashback farming, SMS pumping and credential stuffing, each caught by device intelligence.">
+  <link rel="icon" href="deepvue-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home"><img src="deepvue-logo.png" alt="Deepvue" width="129" height="26"></a>
+      <span class="topbar-tag">Use-case demos</span>
+      <nav class="topbar-nav">
+        <a class="btn btn-primary btn-sm" href="https://dashboard.deepvue.ai/sign-up">Get an SDK key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Fraud demos for lenders and fintechs</h1>
+      <p class="lede">
+        Four fake apps, each with a fraud attempt you can try yourself and the check that catches it.
+        No sign-up. Open a private window or clear your cookies halfway through: the device is still
+        recognised.
+      </p>
+    </section>
+
+    <ul class="demos">
+      <li>
+        <a class="card demo-card" href="loan">
+          <h2>Loan application</h2>
+          <p>Someone is declined, raises their income and applies again from the same phone.</p>
+          <p class="catch">Catches: repeat applications with changed details; VPN and data-centre traffic gets an extra step.</p>
+          <span class="go">Try it →</span>
+        </a>
+      </li>
+      <li>
+        <a class="card demo-card" href="referral">
+          <h2>Referral cashback</h2>
+          <p>One person opens account after account with fresh mobile numbers to collect the sign-up cashback.</p>
+          <p class="catch">Catches: many sign-ups from one device; the account opens, the cashback doesn't.</p>
+          <span class="go">Try it →</span>
+        </a>
+      </li>
+      <li>
+        <a class="card demo-card" href="otp">
+          <h2>OTP and SMS pumping</h2>
+          <p>A script floods your OTP page with requests to premium-rate numbers, and you pay for every SMS.</p>
+          <p class="catch">Catches: too many OTPs or numbers from one device, and bots.</p>
+          <span class="go">Try it →</span>
+        </a>
+      </li>
+      <li>
+        <a class="card demo-card" href="login">
+          <h2>Sign-in</h2>
+          <p>Leaked username and password pairs replayed one account after another.</p>
+          <p class="catch">Catches: many failed sign-ins from one device, bots; new or risky devices get an OTP.</p>
+          <span class="go">Try it →</span>
+        </a>
+      </li>
+    </ul>
+
+    <section class="card how">
+      <div class="card-head"><h2>How each demo works</h2></div>
+      <ol>
+        <li>When you press the button, the page calls the Deepvue web SDK once: <code>DeepvueImprint.collect()</code>.</li>
+        <li>It sends the device ID and Deepvue's verdict with the form to a small demo server.</li>
+        <li>The server looks up this device's earlier requests and applies the demo's rules.</li>
+        <li><em>What your backend sees</em> shows the server's view, and <em>The code</em> shows the rule that ran.</li>
+      </ol>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://dashboard.deepvue.ai/sign-up">Get your SDK key</a>
+        <a class="btn btn-ghost" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/use-cases">Read the source</a>
+        <a class="btn btn-ghost" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/playground">See your own device in the playground</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>The SDK collects device and browser metadata, never names, phone numbers or emails. The demo server keeps each device's history in memory for 24 hours.</p>
+      <p>© Deepvue. Source: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/use-cases">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
