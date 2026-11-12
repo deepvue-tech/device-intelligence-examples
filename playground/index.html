@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Intelligence Playground | Deepvue</title>
+  <meta name="description" content="See what Deepvue Device Intelligence learns about your own browser: device ID, risk verdict, VPN, bot and private-mode checks. No sign-up.">
+  <link rel="icon" href="deepvue-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home">
+        <img src="deepvue-logo.png" alt="Deepvue" width="129" height="26">
+      </a>
+      <span class="topbar-tag">Device Intelligence playground</span>
+      <nav class="topbar-nav">
+        <a id="nav-guide" class="link" href="#">Setup guide</a>
+        <a id="nav-signup" class="btn btn-primary btn-sm" href="#">Get an SDK key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>This is what Deepvue sees about your device.</h1>
+      <p class="lede">
+        The Deepvue web SDK just ran on this page, the way it would on your login, sign-up or loan
+        application page. No sign-up, nothing to install.
+      </p>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="layout">
+      <div class="col-main">
+        <!-- Verdict and device -->
+        <section class="card" aria-live="polite">
+          <div class="card-head">
+            <h2>Your result</h2>
+            <button id="recheck" class="btn btn-ghost btn-sm" type="button" disabled>Check again</button>
+          </div>
+
+          <div id="result-loading" class="loading">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Checking this device…</span>
+          </div>
+
+          <div id="result-error" class="result-error" hidden></div>
+
+          <div id="result" hidden>
+            <div class="verdict" id="verdict">
+              <span class="verdict-pill" id="verdict-pill"></span>
+              <span class="verdict-text" id="verdict-text"></span>
+            </div>
+
+            <dl class="device">
+              <div>
+                <dt>Device ID</dt>
+                <dd class="device-id-row">
+                  <code id="device-id"></code>
+                  <button id="copy-id" class="btn btn-ghost btn-xs" type="button">Copy</button>
+                </dd>
+              </div>
+              <div>
+                <dt>History</dt>
+                <dd id="device-history"></dd>
+              </div>
+            </dl>
+            <p class="hint" id="same-device" hidden></p>
+          </div>
+        </section>
+
+        <!-- Checks -->
+        <section class="card">
+          <div class="card-head">
+            <h2>What it checked</h2>
+          </div>
+          <ul class="checks" id="checks">
+            <li class="check skel"></li><li class="check skel"></li><li class="check skel"></li><li class="check skel"></li>
+          </ul>
+          <div id="other-signals" class="other" hidden>
+            <h3>Other signals</h3>
+            <ul class="chips" id="other-list"></ul>
+          </div>
+        </section>
+
+        <!-- Integrate -->
+        <section class="card">
+          <div class="card-head">
+            <h2>Add it to your app</h2>
+            <button id="copy-code" class="btn btn-ghost btn-sm" type="button">Copy</button>
+          </div>
+          <p class="muted">Two script tags and one call. The same check, on your own page, under your own key.</p>
+          <pre class="code" id="code"></pre>
+          <div class="cta-row">
+            <a id="cta-signup" class="btn btn-primary" href="#">Get your SDK key</a>
+            <a id="cta-guide" class="btn btn-ghost" href="#">Read the setup guide</a>
+          </div>
+          <p class="muted small">
+            Android, iOS and React Native SDKs return the same verdict, plus hardware attestation and a
+            device ID that survives app reinstalls.
+          </p>
+        </section>
+
+        <details class="card raw">
+          <summary>See the full response</summary>
+          <pre class="code" id="raw"></pre>
+        </details>
+      </div>
+
+      <aside class="col-side">
+        <section class="card">
+          <div class="card-head">
+            <h2>Try to fool it</h2>
+          </div>
+          <ol class="tries">
+            <li>
+              <strong>Turn on a VPN</strong>, then press <em>Check again</em>.
+              Watch the VPN and data-centre checks.
+            </li>
+            <li>
+              <strong>Open developer tools</strong> and check again.
+            </li>
+            <li>
+              <strong>Open this page in a private window.</strong>
+              Watch the private-browsing check, and compare the device ID with this one.
+            </li>
+            <li>
+              <strong>Clear this site's cookies and storage</strong>, reload, and compare the device ID.
+            </li>
+          </ol>
+        </section>
+
+        <section class="card qr-card" id="qr-card">
+          <div class="card-head">
+            <h2>Try it on your phone</h2>
+          </div>
+          <div class="qr" id="qr" aria-label="QR code for this page"></div>
+          <p class="muted small" id="qr-url"></p>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>Your checks</h2>
+          </div>
+          <p class="muted small">Kept in this browser only.</p>
+          <ul class="history" id="history"><li class="muted small">None yet.</li></ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>
+        The SDK collects device and browser metadata, never names, phone numbers or emails. It sets a
+        first-party cookie, <code>_dvfp</code> (90 days), and localStorage keys starting with
+        <code>_dvfp</code>. Deepvue works out an approximate location from the IP address.
+      </p>
+      <p>© Deepvue. Source for this page: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="samples.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
