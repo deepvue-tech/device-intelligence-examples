@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Credential stuffing demo | Deepvue</title>
+  <meta name="description" content="A fake sign-in page that counts failed sign-ins per device, refuses bots, and asks new or risky devices for an OTP.">
+  <link rel="icon" href="deepvue-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home"><img src="deepvue-logo.png" alt="Deepvue" width="129" height="26"></a>
+      <span class="topbar-tag">Use-case demos</span>
+      <nav class="topbar-nav">
+        <a class="link" href="/">All demos</a>
+        <a class="btn btn-primary btn-sm" href="https://dashboard.deepvue.ai/sign-up">Get an SDK key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Catch credential stuffing at sign-in</h1>
+      <p class="lede">
+        Attackers replay leaked username and password pairs, one account after another, from the same
+        machine. Count failures per device rather than per account, and ask a new device for an OTP.
+      </p>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="layout">
+      <div class="col-main">
+        <section class="card">
+          <div class="app-head">
+            <span class="app-logo" aria-hidden="true">DB</span>
+            <div>
+              <h2>Demo Bank</h2>
+              <p class="muted small">Net banking sign-in</p>
+            </div>
+            <span class="app-tag">Fake app</span>
+          </div>
+
+          <form id="form" class="form" novalidate autocomplete="off">
+            <label class="field">
+              <span>Username</span>
+              <input name="username" type="text" value="demo" maxlength="64" required autocapitalize="none" spellcheck="false">
+            </label>
+            <label class="field">
+              <span>Password</span>
+              <input name="password" type="password" maxlength="128" autocomplete="off">
+            </label>
+            <p class="muted small full">The demo account is <code>demo</code> with password <code>deepvue-demo</code>. Don't use a real password here.</p>
+            <div class="form-actions full">
+              <button class="btn btn-primary" type="submit">Sign in</button>
+            </div>
+          </form>
+        </section>
+
+        <div id="shared"></div>
+      </div>
+
+      <aside class="col-side">
+        <section class="card">
+          <div class="card-head"><h2>Try to fool it</h2></div>
+          <ol class="tries">
+            <li><strong>Sign in as demo / deepvue-demo.</strong> A device the account hasn't seen is asked for an OTP.</li>
+            <li><strong>Sign in again.</strong> Known device, no OTP.</li>
+            <li><strong>Try three other usernames</strong> with any password, as a stuffing script would. Then use the right password: blocked.</li>
+            <li><strong>Turn on a VPN.</strong> Even the right password needs an OTP.</li>
+          </ol>
+          <p class="side-note">Press <em>Forget this device</em> to start over.</p>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Why not per account</h2></div>
+          <p class="muted">
+            A stuffing script tries each account once or twice, so per-account lockouts never trip. All
+            those tries come from a handful of devices.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>The SDK collects device and browser metadata, never names, phone numbers or emails. The demo server keeps each device's history in memory for 24 hours, with usernames masked and passwords never stored.</p>
+      <p>© Deepvue. Source: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/use-cases">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+
+  <script src="mock.js"></script>
+  <script src="demo.js"></script>
+  <script>
+    Demo.init({
+      demo: "login",
+      flow: "login",
+      form: document.getElementById("form"),
+      actionLabel: "Sign in",
+      linkedIdName: "loginAttemptId",
+      linkedId: () => Demo.ref("LG"),
+      input: (f) => ({ username: f.username.value, password: f.password.value }),
+    });
+  </script>
+</body>
+</html>

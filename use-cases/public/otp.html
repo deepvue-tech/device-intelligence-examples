@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OTP and SMS pumping demo | Deepvue</title>
+  <meta name="description" content="A fake OTP page that limits SMS per device, refuses bots, and stops one device from sending codes to many numbers.">
+  <link rel="icon" href="deepvue-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home"><img src="deepvue-logo.png" alt="Deepvue" width="129" height="26"></a>
+      <span class="topbar-tag">Use-case demos</span>
+      <nav class="topbar-nav">
+        <a class="link" href="/">All demos</a>
+        <a class="btn btn-primary btn-sm" href="https://dashboard.deepvue.ai/sign-up">Get an SDK key</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Stop SMS pumping on your OTP page</h1>
+      <p class="lede">
+        Bots request OTPs to premium-rate numbers and you pay for every SMS. Limits per phone number or
+        per IP miss it, because the numbers and IPs keep changing. The device doesn't.
+      </p>
+    </section>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div class="layout">
+      <div class="col-main">
+        <section class="card">
+          <div class="app-head">
+            <span class="app-logo" aria-hidden="true">DB</span>
+            <div>
+              <h2>Demo Bank</h2>
+              <p class="muted small">Log in with your mobile number</p>
+            </div>
+            <span class="app-tag">Fake app</span>
+          </div>
+
+          <form id="form" class="form" novalidate>
+            <label class="field full">
+              <span>Mobile number</span>
+              <span class="input-row">
+                <input name="mobile" type="tel" inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10" required>
+                <button id="new-number" class="btn btn-ghost btn-sm" type="button">New number</button>
+              </span>
+              <small>A random sample number. No SMS is sent.</small>
+            </label>
+            <div class="form-actions full">
+              <button class="btn btn-primary" type="submit">Send OTP</button>
+            </div>
+          </form>
+        </section>
+
+        <div id="shared"></div>
+      </div>
+
+      <aside class="col-side">
+        <section class="card">
+          <div class="card-head"><h2>Try to fool it</h2></div>
+          <ol class="tries">
+            <li><strong>Send an OTP.</strong></li>
+            <li><strong>Press New number</strong> and send again. Then once more: the third number from one device is refused.</li>
+            <li><strong>Or keep resending</strong> to one number. The fourth request in 15 minutes is refused.</li>
+            <li><strong>Open a private window</strong> or clear this site's data. The limit still holds.</li>
+            <li><strong>Run it as a bot</strong>, for example in a headless browser. Bots get no SMS at all.</li>
+          </ol>
+          <p class="side-note">Press <em>Forget this device</em> to start over.</p>
+        </section>
+        <section class="card">
+          <div class="card-head"><h2>Where to put the check</h2></div>
+          <p class="muted">
+            Before you call your SMS provider. Every refused request is an SMS you don't pay for.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>The SDK collects device and browser metadata, never names, phone numbers or emails. The demo server keeps each device's history in memory for 24 hours, with mobile numbers masked.</p>
+      <p>© Deepvue. Source: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples/tree/main/use-cases">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+
+  <script src="mock.js"></script>
+  <script src="demo.js"></script>
+  <script>
+    const form = document.getElementById("form");
+    const newNumber = () => (form.mobile.value = "9" + String(Math.floor(Math.random() * 1e9)).padStart(9, "0"));
+    document.getElementById("new-number").addEventListener("click", newNumber);
+    newNumber();
+
+    Demo.init({
+      demo: "otp",
+      flow: "otp_request",
+      form,
+      actionLabel: "Send OTP",
+      linkedIdName: "otpRequestId",
+      linkedId: () => Demo.ref("OTP"),
+      input: (f) => ({ mobile: f.mobile.value }),
+    });
+  </script>
+</body>
+</html>

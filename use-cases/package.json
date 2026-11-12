@@ -1,0 +1,13 @@
+{
+  "name": "deepvue-use-case-demos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fraud use-case demos for Deepvue Device Intelligence: loan stacking, referral abuse, SMS pumping, credential stuffing.",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}
