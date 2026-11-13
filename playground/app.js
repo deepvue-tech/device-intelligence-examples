@@ -17,11 +17,29 @@
   const KEY_PLACEHOLDER = "YOUR_SDK_KEY";
   const $ = (id) => document.getElementById(id);
 
+  // Tones are the dashboard's badge tones (ok, warn, err).
   const VERDICTS = {
     allow: { label: "Allow", tone: "ok", text: "Low risk. Let this visit continue." },
     review: { label: "Review", tone: "warn", text: "Something looks off. Add a step-up check, such as an OTP." },
-    block: { label: "Block", tone: "bad", text: "High risk. Stop this visit, or send it to manual review." },
+    block: { label: "Block", tone: "err", text: "High risk. Stop this visit, or send it to manual review." },
   };
+
+  // The dashboard's icons (Hugeicons), inline so the page needs no icon
+  // library. Fixed strings, never built from response data.
+  const ICONS = {
+    tick: '<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 14l3.5 3.5L19 6.5"/>',
+    alertCircle:
+      '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m.125 3.75H12m.25 0a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0"/></g>',
+    alert:
+      '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M13.925 21h-3.85c-4.63 0-6.945 0-7.799-1.506c-.853-1.506.331-3.503 2.7-7.495L6.9 8.753C9.176 4.918 10.313 3 12 3s2.824 1.918 5.1 5.753L19.023 12c2.369 3.992 3.553 5.989 2.7 7.495C20.87 21 18.555 21 13.924 21M12 9v4"/><path d="M12.125 16.75H12m.25 0a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0"/></g>',
+    info: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m.125-3.75H12m.25 0a.25.25 0 1 0-.5 0a.25.25 0 0 0 .5 0"/></g>',
+  };
+  const STATE_ICON = { flag: "alertCircle", warn: "alert", clear: "tick" };
+
+  // The dashboard's code colours: comments, JSON keys, strings, keywords, numbers.
+  const TOKEN =
+    /(\/\/.*$)|("(?:[^"\\]|\\.)*"(?=\s*:))|('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`[^`]*`)|\b(const|let|var|return|function|new|true|false|null|if|switch|case|break|default)\b|\b(\d+(?:\.\d+)*)\b/g;
+  const TOKEN_CLASS = ["t-com", "t-key", "t-str", "t-kw", "t-num"];
 
   // Each check claims the signal codes it explains; codes left over are listed
   // under "Other signals".
@@ -84,7 +102,7 @@
     "  });",
     "</script>",
   ].join("\n");
-  $("code").textContent = snippet;
+  renderCode($("code"), snippet);
   wireCopy($("copy-code"), () => snippet);
   wireCopy($("copy-id"), () => $("device-id").textContent);
 
@@ -132,7 +150,7 @@
         const sdk = await sdkReady;
         res = await sdk.collect({ tag: { flow } });
       }
-      $("raw").textContent = JSON.stringify(res, null, 2);
+      renderCode($("raw"), JSON.stringify(res, null, 2));
       if (!res || res._error || !res.risk) {
         showError(failureText(res));
       } else {
@@ -152,10 +170,9 @@
     $("result").hidden = false;
 
     const v = VERDICTS[r.risk.action] || { label: r.risk.action || "Unknown", tone: "neutral", text: "" };
-    const pill = $("verdict-pill");
-    pill.textContent = v.label;
-    pill.dataset.tone = v.tone;
-    $("verdict").dataset.tone = v.tone;
+    const badge = $("verdict-badge");
+    badge.textContent = v.label;
+    badge.dataset.tone = v.tone;
     $("verdict-text").textContent = v.text;
 
     const idn = r.identity || {};
@@ -168,10 +185,13 @@
     const same = $("same-device");
     if (previous && previous.device_id && deviceId !== "Not available") {
       same.hidden = false;
-      same.textContent =
+      fillCallout(
+        same,
+        "info",
         previous.device_id === deviceId
           ? "Same device ID as your previous check."
-          : `Different device ID from your previous check (${short(previous.device_id)}).`;
+          : `Different device ID from your previous check (${short(previous.device_id)}).`
+      );
     } else {
       same.hidden = true;
     }
@@ -194,17 +214,28 @@
       if (state === "clear" && c.extra) state = c.extra(r) || "clear";
       if (state !== "clear") flagged.push(c.label);
 
+      // As on the dashboard's session page: a green tick when clear, a red
+      // alert when detected, amber when only suspected.
       const li = el("li", { className: "check", dataset: { state } });
-      const head = el("div", { className: "check-head" });
-      head.append(el("span", { className: "dot", ariaHidden: "true" }), el("span", { className: "check-label", textContent: c.label }));
-      head.append(el("span", { className: "check-state", textContent: STATE_TEXT[state] }));
-      li.append(head, el("p", { className: "check-desc", textContent: c.desc }));
+      const text = el("div", { className: "check-text" });
+      text.append(el("span", { className: "check-label", textContent: c.label }), el("span", { className: "check-desc", textContent: c.desc }));
+      const stateEl =
+        state === "clear"
+          ? el("span", { className: "check-state", textContent: STATE_TEXT[state] })
+          : el("span", { className: "badge", dataset: { tone: state === "flag" ? "err" : "warn" }, textContent: STATE_TEXT[state] });
+      li.append(icon(STATE_ICON[state]), text, stateEl);
       list.append(li);
     }
 
+    // The card head sums it up: how many checks fired.
+    const summary = $("checks-summary");
+    summary.hidden = false;
+    summary.textContent = flagged.length ? `${flagged.length} flagged` : "All clear";
+    summary.dataset.tone = flagged.length ? "err" : "ok";
+
     const others = signals.filter((s) => !used.has(s));
     $("other-signals").hidden = others.length === 0;
-    $("other-list").replaceChildren(...others.map((s) => el("li", { className: "chip", textContent: SIGNAL_TEXT[s] || humanize(s), title: s })));
+    $("other-list").replaceChildren(...others.map((s) => el("li", { className: "badge", textContent: SIGNAL_TEXT[s] || humanize(s), title: s })));
     return flagged;
   }
 
@@ -223,8 +254,9 @@
     $("result").hidden = true;
     const box = $("result-error");
     box.hidden = false;
-    box.textContent = text;
-    $("checks").replaceChildren(el("li", { className: "muted small", textContent: "No checks to show yet." }));
+    fillCallout(box, "err", text);
+    $("checks").replaceChildren(el("li", { className: "text-small faint empty", textContent: "No checks to show yet." }));
+    $("checks-summary").hidden = true;
     $("other-signals").hidden = true;
   }
 
@@ -290,12 +322,12 @@
         const li = el("li");
         const top = el("div", { className: "history-top" });
         top.append(
-          el("span", { className: "pill pill-sm", dataset: { tone: v.tone }, textContent: v.label }),
+          el("span", { className: "badge", dataset: { tone: v.tone }, textContent: v.label }),
           el("code", { textContent: short(h.device_id) }),
-          el("span", { className: "muted small", textContent: time(h.at) + (h.sample ? " · sample" : "") })
+          el("span", { className: "text-caption faint", textContent: time(h.at) + (h.sample ? " · sample" : "") })
         );
         li.append(top);
-        if (h.flags && h.flags.length) li.append(el("div", { className: "muted small", textContent: h.flags.join(", ") }));
+        if (h.flags && h.flags.length) li.append(el("div", { className: "text-caption muted history-flags", textContent: h.flags.join(", ") }));
         return li;
       })
     );
@@ -334,16 +366,66 @@
     return node;
   }
 
+  /** One of ICONS as an inline SVG. */
+  function icon(name) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "ic");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.innerHTML = ICONS[name];
+    return svg;
+  }
+
+  /** A callout's icon and text, as the dashboard draws them. */
+  function fillCallout(box, tone, text) {
+    box.dataset.tone = tone;
+    box.replaceChildren(icon(tone === "info" ? "info" : tone === "warn" ? "alert" : "alertCircle"), el("div", { textContent: text }));
+  }
+
+  /** Code with line numbers and colours, built from text nodes only. */
+  function renderCode(box, code) {
+    box.replaceChildren(
+      ...code.split("\n").map((line, n) => {
+        const row = el("div", { className: "code-line" });
+        const t = el("span", { className: "code-t" });
+        let last = 0;
+        TOKEN.lastIndex = 0;
+        for (let m = TOKEN.exec(line); m; m = TOKEN.exec(line)) {
+          if (m.index > last) t.append(line.slice(last, m.index));
+          const k = m.slice(1).findIndex((g) => g !== undefined);
+          t.append(el("span", { className: TOKEN_CLASS[k], textContent: m[0] }));
+          last = m.index + m[0].length;
+        }
+        if (last < line.length) t.append(line.slice(last));
+        if (!line) t.append(" ");
+        row.append(el("span", { className: "code-n", textContent: String(n + 1) }), t);
+        return row;
+      })
+    );
+  }
+
+  /** Copy, then confirm in green on the button itself and return. */
   function wireCopy(button, getText) {
+    const label = button.querySelector(".copy-label");
+    const idle = label ? label.textContent : "";
+    const idleAria = button.getAttribute("aria-label");
+    let timer;
     button.addEventListener("click", async () => {
-      const label = button.textContent;
+      let ok = true;
       try {
         await navigator.clipboard.writeText(getText());
-        button.textContent = "Copied";
       } catch (_) {
-        button.textContent = "Copy failed";
+        ok = false;
       }
-      setTimeout(() => (button.textContent = label), 1400);
+      button.dataset.copied = ok ? "1" : "";
+      if (label) label.textContent = ok ? "Copied" : "Copy failed";
+      if (idleAria) button.setAttribute("aria-label", ok ? "Copied" : "Copy failed");
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        delete button.dataset.copied;
+        if (label) label.textContent = idle;
+        if (idleAria) button.setAttribute("aria-label", idleAria);
+      }, 1400);
     });
   }
 

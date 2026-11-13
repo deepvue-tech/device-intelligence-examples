@@ -3,153 +3,206 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>Device Intelligence Playground | Deepvue</title>
   <meta name="description" content="See what Deepvue Device Intelligence learns about your own browser: device ID, risk verdict, VPN, bot and private-mode checks. No sign-up.">
-  <link rel="icon" href="deepvue-logo.png">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="style.css">
+  <script src="theme.js"></script>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-in">
       <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home">
-        <img src="deepvue-logo.png" alt="Deepvue" width="129" height="26">
+        <!-- Dark wordmark on light, white on dark; style.css shows one. -->
+        <img class="logo-on-light" src="logo-dark.svg" alt="Deepvue" width="111" height="22">
+        <img class="logo-on-dark" src="logo-white.svg" alt="Deepvue" width="111" height="22">
       </a>
       <span class="topbar-tag">Device Intelligence playground</span>
       <nav class="topbar-nav">
-        <a id="nav-guide" class="link" href="#">Setup guide</a>
-        <a id="nav-signup" class="btn btn-primary btn-sm" href="#">Get an SDK key</a>
+        <a id="nav-guide" class="btn-ghost" href="#">Setup guide</a>
+        <!-- A sun while dark, a moon while light, as in the dashboard. -->
+        <button id="theme-toggle" class="iconbtn theme-toggle" type="button" aria-label="Switch theme">
+          <svg class="ic ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 14.078A8.557 8.557 0 0 1 9.922 2.5C5.668 3.497 2.5 7.315 2.5 11.873a9.627 9.627 0 0 0 9.627 9.627c4.558 0 8.376-3.168 9.373-7.422"/></svg>
+          <svg class="ic ic-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 12a5 5 0 1 1-10 0a5 5 0 0 1 10 0Z"/><path stroke-linecap="round" d="M12 2v1.5m0 17V22m7.07-2.929l-1.06-1.06M5.99 5.989L4.928 4.93M22 12h-1.5m-17 0H2m17.071-7.071l-1.06 1.06M5.99 18.011l-1.06 1.06"/></g></svg>
+        </button>
+        <a id="nav-signup" class="btn-primary" href="#">Get an SDK key</a>
       </nav>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1>This is what Deepvue sees about your device.</h1>
-      <p class="lede">
-        The Deepvue web SDK just ran on this page, the way it would on your login, sign-up or loan
-        application page. No sign-up, nothing to install.
+  <main class="wrap page">
+    <div class="page-head">
+      <h1 class="h2">What Deepvue sees about this device</h1>
+      <p class="sub">
+        The Deepvue web SDK just ran on this page, the way it would on your login, sign-up or loan application
+        page. No sign-up, nothing to install.
       </p>
-    </section>
+    </div>
 
-    <div id="notice" class="notice" hidden></div>
+    <div id="notice" class="callout" data-tone="warn" hidden></div>
 
     <div class="layout">
       <div class="col-main">
         <!-- Verdict and device -->
         <section class="card" aria-live="polite">
           <div class="card-head">
-            <h2>Your result</h2>
-            <button id="recheck" class="btn btn-ghost btn-sm" type="button" disabled>Check again</button>
+            <span class="card-title">Your result</span>
+            <button id="recheck" class="btn-ghost btn-icon" type="button" disabled>
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.01 2v3.132a.314.314 0 0 1-.556.201A9.98 9.98 0 0 0 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10"/></svg>
+              Check again
+            </button>
           </div>
-
-          <div id="result-loading" class="loading">
-            <span class="spinner" aria-hidden="true"></span>
-            <span>Checking this device…</span>
-          </div>
-
-          <div id="result-error" class="result-error" hidden></div>
-
-          <div id="result" hidden>
-            <div class="verdict" id="verdict">
-              <span class="verdict-pill" id="verdict-pill"></span>
-              <span class="verdict-text" id="verdict-text"></span>
+          <div class="card-body">
+            <div id="result-loading" class="loading">
+              <div class="skel" style="width: 38%; height: 12px"></div>
+              <div class="skel" style="width: 72%; height: 16px"></div>
+              <div class="skel" style="width: 55%; height: 12px; margin-top: 8px"></div>
+              <span class="sr-only">Checking this device…</span>
             </div>
 
-            <dl class="device">
-              <div>
-                <dt>Device ID</dt>
-                <dd class="device-id-row">
-                  <code id="device-id"></code>
-                  <button id="copy-id" class="btn btn-ghost btn-xs" type="button">Copy</button>
-                </dd>
+            <div id="result-error" class="callout" data-tone="err" hidden></div>
+
+            <div id="result" hidden>
+              <div class="verdict-row">
+                <span class="eyebrow">Verdict sent to your app</span>
+                <span class="badge" id="verdict-badge"></span>
               </div>
-              <div>
-                <dt>History</dt>
-                <dd id="device-history"></dd>
-              </div>
-            </dl>
-            <p class="hint" id="same-device" hidden></p>
+              <p class="verdict-text" id="verdict-text"></p>
+
+              <dl class="kv">
+                <div class="kv-row">
+                  <dt>Device ID</dt>
+                  <dd class="device-id-row">
+                    <code id="device-id" class="mono-id"></code>
+                    <button id="copy-id" class="iconbtn copy" type="button" aria-label="Copy device ID" title="Copy device ID">
+                      <svg class="ic ic-copy" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M7.5 14.5c0-3.3 0-4.95 1.025-5.975S11.2 7.5 14.5 7.5s4.95 0 5.975 1.025S21.5 11.2 21.5 14.5s0 4.95-1.025 5.975S17.8 21.5 14.5 21.5s-4.95 0-5.975-1.025S7.5 17.8 7.5 14.5"/><path d="M7.5 16.5c-1.396 0-2.095 0-2.656-.196a3.5 3.5 0 0 1-2.148-2.148C2.5 13.595 2.5 12.896 2.5 11.5v-2c0-3.3 0-4.95 1.025-5.975S6.2 2.5 9.5 2.5h2c1.396 0 2.095 0 2.656.196a3.5 3.5 0 0 1 2.148 2.148c.196.561.196 1.26.196 2.656"/></g></svg>
+                      <svg class="ic ic-tick" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 14l3.5 3.5L19 6.5"/></svg>
+                    </button>
+                  </dd>
+                </div>
+                <div class="kv-row">
+                  <dt>History</dt>
+                  <dd id="device-history"></dd>
+                </div>
+              </dl>
+              <div class="callout" data-tone="info" id="same-device" hidden></div>
+            </div>
           </div>
         </section>
 
         <!-- Checks -->
         <section class="card">
           <div class="card-head">
-            <h2>What it checked</h2>
+            <span class="card-title">What it checked</span>
+            <span class="badge" id="checks-summary" hidden></span>
           </div>
           <ul class="checks" id="checks">
-            <li class="check skel"></li><li class="check skel"></li><li class="check skel"></li><li class="check skel"></li>
+            <li class="check"><div class="skel" style="width: 60%; height: 12px"></div></li>
+            <li class="check"><div class="skel" style="width: 50%; height: 12px"></div></li>
+            <li class="check"><div class="skel" style="width: 65%; height: 12px"></div></li>
+            <li class="check"><div class="skel" style="width: 45%; height: 12px"></div></li>
           </ul>
           <div id="other-signals" class="other" hidden>
-            <h3>Other signals</h3>
-            <ul class="chips" id="other-list"></ul>
+            <span class="eyebrow">Other signals</span>
+            <ul class="badges" id="other-list"></ul>
           </div>
         </section>
 
         <!-- Integrate -->
         <section class="card">
           <div class="card-head">
-            <h2>Add it to your app</h2>
-            <button id="copy-code" class="btn btn-ghost btn-sm" type="button">Copy</button>
+            <span class="card-title">Add it to your app</span>
           </div>
-          <p class="muted">Two script tags and one call. The same check, on your own page, under your own key.</p>
-          <pre class="code" id="code"></pre>
-          <div class="cta-row">
-            <a id="cta-signup" class="btn btn-primary" href="#">Get your SDK key</a>
-            <a id="cta-guide" class="btn btn-ghost" href="#">Read the setup guide</a>
+          <div class="card-body stack">
+            <p class="text-small muted">Two script tags and one call. The same check, on your own page, under your own key.</p>
+            <div class="code-pane">
+              <div class="code-bar">
+                <span class="code-tab">HTML</span>
+                <span class="code-file">index.html</span>
+                <button id="copy-code" class="code-copy copy" type="button">
+                  <svg class="ic ic-copy" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M7.5 14.5c0-3.3 0-4.95 1.025-5.975S11.2 7.5 14.5 7.5s4.95 0 5.975 1.025S21.5 11.2 21.5 14.5s0 4.95-1.025 5.975S17.8 21.5 14.5 21.5s-4.95 0-5.975-1.025S7.5 17.8 7.5 14.5"/><path d="M7.5 16.5c-1.396 0-2.095 0-2.656-.196a3.5 3.5 0 0 1-2.148-2.148C2.5 13.595 2.5 12.896 2.5 11.5v-2c0-3.3 0-4.95 1.025-5.975S6.2 2.5 9.5 2.5h2c1.396 0 2.095 0 2.656.196a3.5 3.5 0 0 1 2.148 2.148c.196.561.196 1.26.196 2.656"/></g></svg>
+                  <svg class="ic ic-tick" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 14l3.5 3.5L19 6.5"/></svg>
+                  <span class="copy-label">Copy</span>
+                </button>
+              </div>
+              <div class="code-lines" id="code"></div>
+            </div>
+            <div class="cta-row">
+              <a id="cta-signup" class="btn-primary btn-icon" href="#">
+                Get your SDK key
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 6s6 4.419 6 6s-6 6-6 6"/></svg>
+              </a>
+              <a id="cta-guide" class="btn-ghost" href="#">Read the setup guide</a>
+            </div>
+            <p class="text-caption faint">
+              Android, iOS and React Native SDKs return the same verdict, plus hardware attestation and a device ID
+              that survives app reinstalls.
+            </p>
           </div>
-          <p class="muted small">
-            Android, iOS and React Native SDKs return the same verdict, plus hardware attestation and a
-            device ID that survives app reinstalls.
-          </p>
         </section>
 
         <details class="card raw">
-          <summary>See the full response</summary>
-          <pre class="code" id="raw"></pre>
+          <summary class="card-head">
+            <span class="card-title">Full response</span>
+            <span class="text-caption faint">What collect() returned</span>
+            <svg class="ic chevron" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9s-4.419 6-6 6s-6-6-6-6"/></svg>
+          </summary>
+          <div class="card-body">
+            <div class="code-pane">
+              <div class="code-lines code-scroll" id="raw"></div>
+            </div>
+          </div>
         </details>
       </div>
 
       <aside class="col-side">
         <section class="card">
           <div class="card-head">
-            <h2>Try to fool it</h2>
+            <svg class="ic head-ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M8 16.5A6.05 6.05 0 0 1 6 12a6 6 0 1 1 12 0a6.05 6.05 0 0 1-2 4.5"/><path stroke-linejoin="round" d="M12 12v4.5M9.5 19h5m-4 2.5h3M3.5 12h-1m3.484-6.024l-.75-.746m12.786.746l.75-.746M21.5 12h-1M12 2.5v1"/></g></svg>
+            <span class="card-title">Try to fool it</span>
           </div>
           <ol class="tries">
             <li>
-              <strong>Turn on a VPN</strong>, then press <em>Check again</em>.
-              Watch the VPN and data-centre checks.
+              <span class="step-n">1</span>
+              <div><b>Turn on a VPN</b>, then press Check again. Watch the VPN and data-centre checks.</div>
             </li>
             <li>
-              <strong>Open developer tools</strong> and check again.
+              <span class="step-n">2</span>
+              <div><b>Open developer tools</b> and check again.</div>
             </li>
             <li>
-              <strong>Open this page in a private window.</strong>
-              Watch the private-browsing check, and compare the device ID with this one.
+              <span class="step-n">3</span>
+              <div><b>Open this page in a private window.</b> Watch the private-browsing check, and compare the device ID with this one.</div>
             </li>
             <li>
-              <strong>Clear this site's cookies and storage</strong>, reload, and compare the device ID.
+              <span class="step-n">4</span>
+              <div><b>Clear this site's cookies and storage</b>, reload, and compare the device ID.</div>
             </li>
           </ol>
         </section>
 
         <section class="card qr-card" id="qr-card">
           <div class="card-head">
-            <h2>Try it on your phone</h2>
+            <svg class="ic head-ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M13.5 2h-3c-2.357 0-3.536 0-4.268.732S5.5 4.643 5.5 7v10c0 2.357 0 3.535.732 4.268S8.143 22 10.5 22h3c2.357 0 3.535 0 4.268-.732c.732-.733.732-1.911.732-4.268V7c0-2.357 0-3.536-.732-4.268C17.035 2 15.857 2 13.5 2"/><path d="M12.125 19H12m.25 0a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0"/></g></svg>
+            <span class="card-title">Try it on your phone</span>
           </div>
-          <div class="qr" id="qr" aria-label="QR code for this page"></div>
-          <p class="muted small" id="qr-url"></p>
+          <div class="card-body qr-body">
+            <div class="qr" id="qr" aria-label="QR code for this page"></div>
+            <p class="text-caption faint mono" id="qr-url"></p>
+          </div>
         </section>
 
         <section class="card">
           <div class="card-head">
-            <h2>Your checks</h2>
+            <svg class="ic head-ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l2 2"/></g></svg>
+            <span class="card-title">Your checks</span>
+            <span class="text-caption faint push">Kept in this browser only</span>
           </div>
-          <p class="muted small">Kept in this browser only.</p>
-          <ul class="history" id="history"><li class="muted small">None yet.</li></ul>
+          <ul class="history" id="history"><li class="text-small faint empty">None yet.</li></ul>
         </section>
       </aside>
     </div>
@@ -158,11 +211,11 @@
   <footer class="footer">
     <div class="wrap">
       <p>
-        The SDK collects device and browser metadata, never names, phone numbers or emails. It sets a
-        first-party cookie, <code>_dvfp</code> (90 days), and localStorage keys starting with
-        <code>_dvfp</code>. Deepvue works out an approximate location from the IP address.
+        The SDK collects device and browser metadata, never names, phone numbers or emails. It sets a first-party
+        cookie, <code>_dvfp</code> (90 days), and localStorage keys starting with <code>_dvfp</code>. Deepvue works
+        out an approximate location from the IP address.
       </p>
-      <p>© Deepvue. Source for this page: <a class="link" href="https://github.com/deepvue-tech/device-intelligence-examples">deepvue-tech/device-intelligence-examples</a>.</p>
+      <p>© Deepvue. Source for this page: <a href="https://github.com/deepvue-tech/device-intelligence-examples">deepvue-tech/device-intelligence-examples</a>.</p>
     </div>
   </footer>
 
