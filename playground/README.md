@@ -5,7 +5,10 @@ the risk verdict (allow, review or block), the device ID and how often it has be
 check (bot, private browsing, developer tools, VPN, proxy, Tor, data-centre IP, time zone vs IP).
 Visitors can turn on a VPN or open a private window and check again. Nothing to sign up for.
 
-It is plain HTML, CSS and JavaScript with no build step.
+It is plain HTML, CSS and JavaScript with no build step. It uses the Deepvue dashboard's design
+(colours, type, cards, badges and icons, copied into `style.css`), in light or dark mode: it follows
+the system setting until the visitor picks one with the button in the top bar (`theme.js`, kept in
+this browser). It works from phone width up.
 
 ## Run it locally
 
