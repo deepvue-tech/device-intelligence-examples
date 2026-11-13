@@ -37,7 +37,9 @@ of customers' Risk Monitoring. Each check is tagged `flow: playground`.
 
 **Device check links.** `?key=<SDK key>` runs the check under that key instead, tagged
 `flow: device_check`, so a customer can send the link to testers and see the results in their own
-dashboard without writing code. The QR code then carries the key too.
+dashboard without writing code. A test key (`sk_test_…`) works too: those checks are free and show
+in the dashboard's test data. The QR code then carries the key too. A malformed key shows an error
+and runs no check.
 
 ## Costs and limits
 

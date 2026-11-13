@@ -5,9 +5,12 @@
   const samples = window.PLAYGROUND_SAMPLES || {};
   const params = new URLSearchParams(location.search);
   const sampleName = params.get("sample");
-  // Device check link: ?key=<customer's SDK key> runs the check under that
-  // account, so results land in the customer's own dashboard.
-  const linkKey = /^sk_[0-9a-f]{40}$/.test(params.get("key") || "") ? params.get("key") : null;
+  // Device check link: ?key=<customer's SDK key, live or test> runs the check
+  // under that account, so results land in the customer's own dashboard.
+  // A malformed key must not fall back to config.js: that would bill our account.
+  const keyParam = params.get("key");
+  const linkKey = keyParam !== null && /^sk_(test_)?[0-9a-f]{40}$/.test(keyParam) ? keyParam : null;
+  const badLinkKey = keyParam !== null && linkKey === null;
   const sdkKey = linkKey || cfg.sdkKey;
   const flow = linkKey ? "device_check" : "playground";
   const HISTORY_KEY = "dv_playground_checks";
@@ -95,6 +98,9 @@
   void check();
 
   function loadSdk() {
+    if (badLinkKey) {
+      return Promise.reject(new PlaygroundError("bad-key"));
+    }
     if (!sdkKey || sdkKey === KEY_PLACEHOLDER) {
       return Promise.reject(new PlaygroundError("no-key"));
     }
@@ -227,12 +233,18 @@
     if (kind === "no-key") {
       return "This copy of the playground has no SDK key. Put one in config.js, or preview it with ?sample=allow, ?sample=review or ?sample=block.";
     }
+    if (kind === "bad-key") {
+      return "This link's SDK key isn't valid, so no check was run. Ask whoever sent the link for a new one.";
+    }
     if (kind === "blocked") {
       return "Your browser blocked the Deepvue script, usually an ad or privacy blocker. Allow it on this page and press Check again.";
     }
     if (kind === "no-sample") return "No such sample. Use ?sample=allow, review, block or error.";
     const raw = String((res && res._error) || (err && err.message) || "");
     const status = Number((raw.match(/\b([45]\d\d)\b/) || [])[1]);
+    if ((status === 401 || status === 403) && linkKey) {
+      return `Deepvue refused this link's SDK key (HTTP ${status}). It may have been rotated: ask whoever sent the link for a new one.`;
+    }
     if (status === 401 || status === 403) return `Deepvue refused this page's SDK key (HTTP ${status}). Check the key in config.js.`;
     if (status === 402) return "The demo account behind this page is out of credit (HTTP 402). Please try again later.";
     if (status === 429) return "Too many checks from this demo right now (HTTP 429). Try again in a minute.";
