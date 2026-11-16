@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ai.deepvue.deepvuefp",
+      "sha256_cert_fingerprints": [
+        "DB:EF:EE:C9:2E:8B:5C:4D:1F:4D:23:EF:08:1C:05:38:24:3E:DA:14:A1:F6:99:B1:73:D0:31:1B:55:14:0B:D2",
+        "02:4F:73:D0:DC:15:D7:D0:2E:8A:7D:D8:82:0F:EA:19:51:1B:A9:37:F2:38:F7:C6:49:DD:2F:00:91:E2:DB:E7"
+      ]
+    }
+  }
+]

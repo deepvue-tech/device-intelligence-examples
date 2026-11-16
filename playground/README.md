@@ -44,6 +44,32 @@ dashboard without writing code. A test key (`sk_test_…`) works too: those chec
 in the dashboard's test data. The QR code then carries the key too. A malformed key shows an error
 and runs no check.
 
+## Pairing link for the demo apps
+
+`https://<host>/pair#<SDK key>` opens Deepvue's demo app (Android `ai.deepvue.deepvuefp`, iOS
+`ai.deepvue.fpdemo`) with that SDK key already set. A customer opens the link on a laptop, and
+`pair` shows a QR code of it; scanning it with the phone's camera opens the app. The key stays
+after `#`, which browsers never send to a server, and the page sends no requests with it.
+
+- **App installed:** Android App Links and iOS Universal Links open the app straight from the
+  camera. `.well-known/assetlinks.json` (the Play app signing and upload certificates) and
+  `.well-known/apple-app-site-association` (path `/pair*`) let each app claim the link.
+- **App not installed:** the phone shows `pair` instead. On Android, the Google Play button carries
+  the key in the install referrer (`referrer=dv_key%3D<key>`), and the app reads it on first launch.
+  On iPhone, the App Store passes nothing through, so the page asks to scan the QR code again
+  after installing.
+- **No key in the link:** on a laptop, the page asks for one and builds the link and QR code in
+  the browser.
+
+The apps trust this one host, so moving the page to another host needs new app builds.
+
+To preview locally, serve the folder with `pair` as HTML (Python's server sends files without an
+extension as downloads), then open <http://127.0.0.1:5510/pair#sk_test_example123>:
+
+```bash
+cd playground && python3 -c 'import http.server as s; s.SimpleHTTPRequestHandler.extensions_map[""] = "text/html"; s.test(s.SimpleHTTPRequestHandler, s.ThreadingHTTPServer, port=5510, bind="127.0.0.1")'
+```
+
 ## Costs and limits
 
 - **Every check is one collect**, billed like any other collect on the account whose key is in
@@ -61,9 +87,17 @@ creates a private S3 bucket served only through CloudFront (origin access contro
 your SDK key in `config.js`:
 
 ```bash
-aws s3 sync playground/ s3://<bucket>/ --exclude README.md --cache-control "public, max-age=300" --delete
+aws s3 sync playground/ s3://<bucket>/ --exclude README.md --exclude pair \
+  --exclude .well-known/apple-app-site-association --cache-control "public, max-age=300" --delete
+aws s3 cp playground/pair s3://<bucket>/pair \
+  --content-type "text/html; charset=utf-8" --cache-control "public, max-age=300"
+aws s3 cp playground/.well-known/apple-app-site-association s3://<bucket>/.well-known/apple-app-site-association \
+  --content-type application/json --cache-control "public, max-age=300"
 aws cloudfront create-invalidation --distribution-id <distribution id> --paths "/*"
 ```
+
+The two files without an extension get their content types from the `cp` commands: `sync` would
+upload them as `binary/octet-stream`, and the browser would download `/pair` instead of showing it.
 
 The page loads from outside the folder:
 

@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["8XTC7FS78F.ai.deepvue.fpdemo"],
+        "components": [{ "/": "/pair*" }]
+      }
+    ]
+  }
+}

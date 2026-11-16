@@ -1,0 +1,127 @@
+<!doctype html>
+<!-- Served at /pair with Content-Type text/html (README: Deploy). The demo
+     apps open https://<this host>/pair#<SDK key> as an app link; this page is
+     what shows when the app isn't installed, or on a laptop. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex">
+  <title>Open the app with your SDK key | Deepvue</title>
+  <meta name="description" content="Open Deepvue Device Intelligence on your phone with your SDK key already set.">
+  <link rel="icon" href="logo-mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="https://deepvue.ai" aria-label="Deepvue home">
+        <img class="logo-on-light" src="logo-dark.svg" alt="Deepvue" width="111" height="22">
+        <img class="logo-on-dark" src="logo-white.svg" alt="Deepvue" width="111" height="22">
+      </a>
+      <span class="topbar-tag">Device Intelligence app</span>
+      <nav class="topbar-nav">
+        <button id="theme-toggle" class="iconbtn theme-toggle" type="button" aria-label="Switch theme">
+          <svg class="ic ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21.5 14.078A8.557 8.557 0 0 1 9.922 2.5C5.668 3.497 2.5 7.315 2.5 11.873a9.627 9.627 0 0 0 9.627 9.627c4.558 0 8.376-3.168 9.373-7.422"/></svg>
+          <svg class="ic ic-sun" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 12a5 5 0 1 1-10 0a5 5 0 0 1 10 0Z"/><path stroke-linecap="round" d="M12 2v1.5m0 17V22m7.07-2.929l-1.06-1.06M5.99 5.989L4.928 4.93M22 12h-1.5m-17 0H2m17.071-7.071l-1.06 1.06M5.99 18.011l-1.06 1.06"/></g></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap page">
+    <div class="page-head">
+      <h1 class="h2" id="title">Open the app with your SDK key</h1>
+      <p class="sub" id="lead"></p>
+    </div>
+
+    <div id="bad-key" class="callout pair-callout" data-tone="err" hidden>
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 7.5v5.5m0 3.5v.01"/></g></svg>
+      <span>This link doesn't contain a valid SDK key. Deepvue SDK keys start with <code>sk_</code>.</span>
+    </div>
+
+    <div class="layout">
+      <div class="col-main">
+        <!-- Laptop with a key: the QR code of this link. -->
+        <section id="view-qr" class="card" hidden>
+          <div class="card-head">
+            <span class="card-title">Your QR code</span>
+            <button id="other-key" class="btn-ghost" type="button">Use a different key</button>
+          </div>
+          <div class="card-body pair-qr-body">
+            <div class="qr pair-qr" id="qr" role="img" aria-label="QR code of this link"></div>
+            <p class="pair-scan">Scan with your phone's camera</p>
+            <p class="text-caption faint mono pair-link" id="qr-link"></p>
+          </div>
+        </section>
+
+        <!-- Laptop without a key: build the link here, in this browser. -->
+        <section id="view-paste" class="card" hidden>
+          <div class="card-head">
+            <span class="card-title">Your SDK key</span>
+          </div>
+          <form id="paste-form" class="card-body stack" novalidate>
+            <label for="key-input" class="text-small">
+              Paste the SDK key from the <a href="https://dashboard.deepvue.ai/intelligence/device-intelligence/setup">Deepvue console</a>.
+              The QR code is made in this browser; the key isn't sent anywhere.
+            </label>
+            <input id="key-input" class="pair-input" type="text" placeholder="sk_…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+            <p id="paste-error" class="text-small pair-error" role="alert" hidden>That doesn't look like a Deepvue SDK key. It starts with sk_.</p>
+            <div><button class="btn-primary" type="submit">Make QR code</button></div>
+          </form>
+        </section>
+
+        <!-- Phone: the app isn't installed (or is too old to open this link). -->
+        <section id="view-phone" class="card" hidden>
+          <div class="card-body stack">
+            <a id="store-btn" class="btn-primary pair-store" href="#"></a>
+            <p id="phone-after" class="pair-after" hidden>After installing, scan the QR code again. The app opens with your SDK key already set.</p>
+            <p id="phone-update" class="text-small muted" hidden>Already have the app? Update it, then scan the QR code again.</p>
+          </div>
+        </section>
+
+        <div id="share-note" class="callout" data-tone="warn" hidden>
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M15.5 14.5a6 6 0 1 0-5.66-4l-6.34 6.34V20.5h3.66v-2h2v-2h2l1.34-1.34a6 6 0 0 0 3 .34Z"/><path d="M17.5 7.5h.01"/></g></svg>
+          <span>This link contains your SDK key. Share it only with your team.</span>
+        </div>
+      </div>
+
+      <aside class="col-side" id="side">
+        <section id="view-install" class="card">
+          <div class="card-head">
+            <span class="card-title">Install the app first</span>
+          </div>
+          <div class="card-body stack">
+            <p class="text-small">
+              Don't have Deepvue Device Intelligence on your phone? Install it, then scan the code.
+              Have an older version? Update it first.
+            </p>
+            <div class="cta-row">
+              <a class="btn-ghost" href="https://play.google.com/store/apps/details?id=ai.deepvue.deepvuefp">Google Play</a>
+              <a class="btn-ghost" href="https://apps.apple.com/app/id6787858365">App Store</a>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>
+        Your SDK key sits after the <code>#</code> in this link. Browsers never send that part to a server, and this
+        page sends no requests with it.
+      </p>
+      <p>© Deepvue. Source for this page: <a href="https://github.com/deepvue-tech/device-intelligence-examples">deepvue-tech/device-intelligence-examples</a>.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous" defer></script>
+  <script src="pair.js" defer></script>
+</body>
+</html>
