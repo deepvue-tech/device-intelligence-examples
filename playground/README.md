@@ -40,8 +40,9 @@ of customers' Risk Monitoring. Each check is tagged `flow: playground`.
 
 **Device check links.** `?key=<SDK key>` runs the check under that key instead, tagged
 `flow: device_check`, so a customer can send the link to testers and see the results in their own
-dashboard without writing code. A test key (`sk_test_…`) works too: those checks are free and show
-in the dashboard's test data. The QR code then carries the key too. A malformed key shows an error
+dashboard without writing code. A playground key (`sk_playground_…`) works too. It works from any
+site and in the demo apps, is free up to 100 collects a month, and its sessions show under
+Playground in the dashboard. The QR code then carries the key too. A malformed key shows an error
 and runs no check.
 
 ## Pairing link for the demo apps
@@ -64,7 +65,7 @@ after `#`, which browsers never send to a server, and the page sends no requests
 The apps trust this one host, so moving the page to another host needs new app builds.
 
 To preview locally, serve the folder with `pair` as HTML (Python's server sends files without an
-extension as downloads), then open <http://127.0.0.1:5510/pair#sk_test_example123>:
+extension as downloads), then open <http://127.0.0.1:5510/pair#sk_playground_example123>:
 
 ```bash
 cd playground && python3 -c 'import http.server as s; s.SimpleHTTPRequestHandler.extensions_map[""] = "text/html"; s.test(s.SimpleHTTPRequestHandler, s.ThreadingHTTPServer, port=5510, bind="127.0.0.1")'

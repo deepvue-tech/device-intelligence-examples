@@ -5,11 +5,11 @@
   const samples = window.PLAYGROUND_SAMPLES || {};
   const params = new URLSearchParams(location.search);
   const sampleName = params.get("sample");
-  // Device check link: ?key=<customer's SDK key, live or test> runs the check
+  // Device check link: ?key=<customer's SDK key, live or playground> runs the check
   // under that account, so results land in the customer's own dashboard.
   // A malformed key must not fall back to config.js: that would bill our account.
   const keyParam = params.get("key");
-  const linkKey = keyParam !== null && /^sk_(test_)?[0-9a-f]{40}$/.test(keyParam) ? keyParam : null;
+  const linkKey = keyParam !== null && /^sk_(playground_)?[0-9a-f]{40}$/.test(keyParam) ? keyParam : null;
   const badLinkKey = keyParam !== null && linkKey === null;
   const sdkKey = linkKey || cfg.sdkKey;
   const flow = linkKey ? "device_check" : "playground";
