@@ -41,9 +41,9 @@ of customers' Risk Monitoring. Each check is tagged `flow: playground`.
 **Device check links.** `?key=<SDK key>` runs the check under that key instead, tagged
 `flow: device_check`, so a customer can send the link to testers and see the results in their own
 dashboard without writing code. A playground key (`sk_playground_…`) works too. It works from any
-site and in the demo apps, is free up to 100 collects a month, and its sessions show under
-Playground in the dashboard. The QR code then carries the key too. A malformed key shows an error
-and runs no check.
+site and in the demo apps, is free up to 100 collects a day (resets at 00:00 UTC), and its
+sessions show under Playground in the dashboard. The QR code then carries the key too. A malformed
+key shows an error and runs no check.
 
 ## Pairing link for the demo apps
 
