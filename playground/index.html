@@ -191,15 +191,21 @@
             <span class="card-title">Try it on your phone</span>
           </div>
           <div class="card-body qr-body">
+            <!-- Mobile app by default (the app shows every check); Web swaps
+                 the code for this page in the phone's browser. The same tabs
+                 as the dashboard's launch modal and Try it page. -->
+            <div class="qr-tabs" role="tablist" aria-label="What the code opens">
+              <button class="qr-tab" type="button" role="tab" data-target="app" aria-selected="true">Mobile app</button>
+              <button class="qr-tab" type="button" role="tab" data-target="web" aria-selected="false">Web</button>
+            </div>
             <div class="qr" id="qr" role="img" aria-label="QR code to try this on your phone"></div>
-            <!-- Phone app by default (the app shows every check); a switch
-                 swaps the code for this page in the phone's browser. -->
-            <button class="qr-switch" id="qr-switch" type="button" role="switch" aria-checked="false">
-              <span class="qr-switch-track" aria-hidden="true"><span class="qr-switch-knob"></span></span>
-              Phone browser instead
-            </button>
             <p class="text-small muted qr-what" id="qr-what"></p>
             <p class="text-caption faint mono" id="qr-url"></p>
+            <button id="qr-copy" class="btn-ghost btn-icon copy qr-copy" type="button">
+              <svg class="ic ic-copy" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><path d="M9.521 14.48l4.96-4.96"/><path d="M16.952 15.693l2.218-2.218a5.004 5.004 0 0 0-7.077-7.077L9.875 8.616M7.048 8.307L4.83 10.525a5.004 5.004 0 0 0 7.077 7.077l2.218-2.218"/></g></svg>
+              <svg class="ic ic-tick" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 14l3.5 3.5L19 6.5"/></svg>
+              <span class="copy-label">Copy link</span>
+            </button>
           </div>
         </section>
 

@@ -46,9 +46,9 @@ sessions show under Playground in the dashboard. The QR code then carries the ke
 key shows an error and runs no check.
 
 **Try it on your phone.** The QR code opens the demo app by default (the pairing link below, with
-the key this page runs on). A switch under it, "Phone browser instead", swaps it for this page in
-the phone's browser. Under the code, the link shows with the key shortened (`sk_…abcd`); the code
-carries it whole. Both QR codes on the site are drawn by `qr.js` in the console's style: round dots,
+the key this page runs on). Mobile app / Web tabs over it (the dashboard's launch modal and Try it
+page have the same) swap it for this page in the phone's browser. Under the code, the link shows
+with the key shortened (`sk_…abcd`); the code carries it whole, and Copy link copies it whole. Both QR codes on the site are drawn by `qr.js` in the console's style: round dots,
 rounded corners and the Deepvue mark in the middle (error correction Q, so the mark costs nothing).
 
 ## Pairing link for the demo apps
