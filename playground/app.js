@@ -15,6 +15,10 @@
   const flow = linkKey ? "device_check" : "playground";
   const HISTORY_KEY = "dv_playground_checks";
   const KEY_PLACEHOLDER = "YOUR_SDK_KEY";
+  // The phone code's target: "app" (default) or "web" (renderQr).
+  let qrTarget = "app";
+  // A key on screen, shortened: the QR carries it whole.
+  const mask = (key) => "sk_…" + key.slice(-4);
   const $ = (id) => document.getElementById(id);
 
   // Tones are the dashboard's badge tones (ok, warn, err).
@@ -335,19 +339,47 @@
 
   /* ---------- QR for trying on a phone ---------- */
 
+  // Two codes, one at a time, as on the console's Try it page:
+  //   app (default) - /pair#<key>: the phone opens the Deepvue app with the
+  //                   key set (an app link); without the app, /pair offers
+  //                   it. The key sits after the #, so it never reaches a
+  //                   server.
+  //   web           - this page with ?key=, in the phone's browser.
+  // The key is the one this page runs on: the link's, else config.js's.
+  // (qrTarget and mask sit at the top: renderQr runs before this point.)
+
   function renderQr() {
     const card = $("qr-card");
-    if (location.protocol === "file:" || typeof window.qrcode !== "function") {
+    if (location.protocol === "file:" || typeof window.qrcode !== "function" || typeof window.brandedQrSvg !== "function") {
       card.hidden = true;
       return;
     }
-    const url = location.origin + location.pathname + (linkKey ? `?key=${linkKey}` : "");
-    const qr = window.qrcode(0, "M");
-    qr.addData(url);
-    qr.make();
-    $("qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-    $("qr-url").textContent = url;
+    const dir = location.origin + location.pathname.replace(/[^/]*$/, "");
+    const key = linkKey || (cfg.sdkKey && cfg.sdkKey !== KEY_PLACEHOLDER ? cfg.sdkKey : null);
+    const app = qrTarget === "app";
+    const url = app
+      ? dir + "pair" + (key ? "#" + encodeURIComponent(key) : "")
+      : location.origin + location.pathname + (linkKey ? `?key=${linkKey}` : "");
+    $("qr").innerHTML = window.brandedQrSvg(url);
+    $("qr-what").textContent = app
+      ? "Opens the Deepvue app with this key, on Android and iPhone. No app yet? The link offers it."
+      : "Opens this check in the phone's browser. No app needed.";
+    // The link under the code, with the key shortened: the code carries it
+    // whole, the screen doesn't need to.
+    const shown = app ? dir + "pair" + (key ? "#" + mask(key) : "") : location.origin + location.pathname + (linkKey ? `?key=${mask(linkKey)}` : "");
+    $("qr-url").textContent = shown.replace(/^https?:\/\//, "");
+    const sw = $("qr-switch");
+    sw.setAttribute("aria-checked", String(!app));
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const sw = $("qr-switch");
+    if (!sw) return;
+    sw.addEventListener("click", () => {
+      qrTarget = qrTarget === "app" ? "web" : "app";
+      renderQr();
+    });
+  });
 
   /* ---------- helpers ---------- */
 

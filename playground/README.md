@@ -45,6 +45,12 @@ site and in the demo apps, is free up to 100 collects a day (resets at 00:00 UTC
 sessions show under Playground in the dashboard. The QR code then carries the key too. A malformed
 key shows an error and runs no check.
 
+**Try it on your phone.** The QR code opens the demo app by default (the pairing link below, with
+the key this page runs on). A switch under it, "Phone browser instead", swaps it for this page in
+the phone's browser. Under the code, the link shows with the key shortened (`sk_…abcd`); the code
+carries it whole. Both QR codes on the site are drawn by `qr.js` in the console's style: round dots,
+rounded corners and the Deepvue mark in the middle (error correction Q, so the mark costs nothing).
+
 ## Pairing link for the demo apps
 
 `https://<host>/pair#<SDK key>` opens Deepvue's demo app (Android `ai.deepvue.deepvuefp`, iOS
@@ -103,7 +109,7 @@ upload them as `binary/octet-stream`, and the browser would download `/pair` ins
 The page loads from outside the folder:
 
 - the SDK from the Deepvue CDN (`sdkUrl`), which calls `https://sidc.deepvue.ai`;
-- `qrcode-generator` from cdnjs, with an integrity hash;
+- `qrcode-generator` from cdnjs, with an integrity hash (`qr.js` draws the branded code from it);
 - Nunito Sans and IBM Plex Mono from Google Fonts.
 
 A Content Security Policy needs those hosts in `script-src`, `connect-src`, `style-src` and
