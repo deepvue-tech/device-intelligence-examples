@@ -264,6 +264,18 @@
     $("other-signals").hidden = true;
   }
 
+  /** When the playground key's daily count resets: the next 00:00 UTC, said
+   *  in the visitor's own time, e.g. "tomorrow at 5:30 am (00:00 UTC)". */
+  function resetWords() {
+    const now = new Date();
+    const at = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const dayStart = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const days = Math.round((dayStart(at) - dayStart(now)) / 86400000);
+    const day = days === 0 ? "today" : days === 1 ? "tomorrow" : at.toLocaleDateString(undefined, { weekday: "long" });
+    const time = at.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }).toLowerCase();
+    return `${day} at ${time} (00:00 UTC)`;
+  }
+
   function failureText(res, err) {
     const kind = err && err.kind;
     if (kind === "no-key") {
@@ -283,7 +295,15 @@
     }
     if (status === 401 || status === 403) return `Deepvue refused this page's SDK key (HTTP ${status}). Check the key in config.js.`;
     if (status === 402) return "The demo account behind this page is out of credit (HTTP 402). Please try again later.";
-    if (status === 429) return "Too many checks from this demo right now (HTTP 429). Try again in a minute.";
+    // Web SDK 3.2.3 hands back only "Server returned 429", not the body, so
+    // the key decides what it means. A playground key (sk_playground_) has a
+    // daily cap of 100 collects per account, which resets at 00:00 UTC; any
+    // other key has no daily cap, so a 429 there is the hourly per-key rate
+    // limit (backend, 19 Nov).
+    if (status === 429 && linkKey && linkKey.startsWith("sk_playground_")) {
+      return `Today's 100 free checks for this key are used. You get more ${resetWords()}.`;
+    }
+    if (status === 429) return "Too many checks from this key right now (HTTP 429). Please try again later.";
     return `The check didn't go through${status ? ` (HTTP ${status})` : ""}. Press Check again.`;
   }
 

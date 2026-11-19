@@ -85,7 +85,11 @@ cd playground && python3 -c 'import http.server as s; s.SimpleHTTPRequestHandler
   account's wallet balance capped. When it runs out, the page says the demo is out of credit
   (HTTP 402).
 - **Collects are rate-limited per key**, and every visitor shares the limit. Over it, the page
-  asks the visitor to try again in a minute (HTTP 429).
+  asks the visitor to try again later (HTTP 429).
+- **A playground key (`sk_playground_…`) is free for 100 collects a day**, counted per account
+  (rotating the key doesn't reset it), resetting at 00:00 UTC. Over it, a link with that key
+  says today's free checks are used and when more arrive, in the visitor's own time. The Web SDK
+  only reports "Server returned 429", so the page tells the two apart by the key's prefix.
 
 ## Deploy
 
