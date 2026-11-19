@@ -17,6 +17,8 @@
   const KEY_PLACEHOLDER = "YOUR_SDK_KEY";
   // The phone code's target: "app" (default) or "web" (renderQr).
   let qrTarget = "app";
+  // The code's full link, for Copy link: the tab on show, key included.
+  let qrLink = "";
   // A key on screen, shortened: the QR carries it whole.
   const mask = (key) => "sk_…" + key.slice(-4);
   const $ = (id) => document.getElementById(id);
@@ -388,17 +390,20 @@
     // whole, the screen doesn't need to.
     const shown = app ? dir + "pair" + (key ? "#" + mask(key) : "") : location.origin + location.pathname + (linkKey ? `?key=${mask(linkKey)}` : "");
     $("qr-url").textContent = shown.replace(/^https?:\/\//, "");
-    const sw = $("qr-switch");
-    sw.setAttribute("aria-checked", String(!app));
+    qrLink = url;
+    document.querySelectorAll(".qr-tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.target === qrTarget)));
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    const sw = $("qr-switch");
-    if (!sw) return;
-    sw.addEventListener("click", () => {
-      qrTarget = qrTarget === "app" ? "web" : "app";
-      renderQr();
-    });
+    document.querySelectorAll(".qr-tab").forEach((t) =>
+      t.addEventListener("click", () => {
+        if (qrTarget === t.dataset.target) return;
+        qrTarget = t.dataset.target;
+        renderQr();
+      })
+    );
+    const copy = $("qr-copy");
+    if (copy) wireCopy(copy, () => qrLink);
   });
 
   /* ---------- helpers ---------- */
