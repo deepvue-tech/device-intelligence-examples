@@ -191,7 +191,14 @@
             <span class="card-title">Try it on your phone</span>
           </div>
           <div class="card-body qr-body">
-            <div class="qr" id="qr" aria-label="QR code for this page"></div>
+            <div class="qr" id="qr" role="img" aria-label="QR code to try this on your phone"></div>
+            <!-- Phone app by default (the app shows every check); a switch
+                 swaps the code for this page in the phone's browser. -->
+            <button class="qr-switch" id="qr-switch" type="button" role="switch" aria-checked="false">
+              <span class="qr-switch-track" aria-hidden="true"><span class="qr-switch-knob"></span></span>
+              Phone browser instead
+            </button>
+            <p class="text-small muted qr-what" id="qr-what"></p>
             <p class="text-caption faint mono" id="qr-url"></p>
           </div>
         </section>
@@ -222,6 +229,7 @@
   <script src="config.js"></script>
   <script src="samples.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous" defer></script>
+  <script src="qr.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

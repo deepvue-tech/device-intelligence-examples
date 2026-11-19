@@ -67,15 +67,13 @@
     const link = location.origin + location.pathname + "#" + encodeURIComponent(key);
     $("qr-link").textContent = location.host + location.pathname + "#" + mask(key);
     const box = $("qr");
-    if (typeof window.qrcode !== "function") {
+    if (typeof window.qrcode !== "function" || typeof window.brandedQrSvg !== "function") {
       box.textContent = "Couldn't draw the QR code. Reload the page.";
       return;
     }
     try {
-      const qr = window.qrcode(0, "M");
-      qr.addData(link);
-      qr.make();
-      box.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+      // Branded like the console's codes (qr.js).
+      box.innerHTML = window.brandedQrSvg(link);
     } catch (_) {
       // Only a pasted value too long for any QR code gets here.
       box.textContent = "This key is too long for a QR code.";
